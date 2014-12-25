@@ -1,8 +1,7 @@
 import numpy
 import itertools
 
-def hdp_for(values, level=.95):
-    rounded_values = map(lambda x: round(x, 2), values)
+def hdp_for(rounded_values, level=.95):
     groupings = {}
     for value in rounded_values:
         if not value in groupings:
@@ -25,8 +24,10 @@ def fast_mean_sample(hypotheses, observations):
   return (sampled_data*hypotheses).sum()/sampled_data.sum()
   
 def bayesian_bootstrap(numbers, sample_count=5000):
-  histogram = list((k, len(list(g)))
-           for k, g in itertools.groupby(sorted(numbers)))
+  for i in numbers:
+    if not type(i) is int:
+      raise TypeError('All data must be integers.') 
+  histogram = list((k, len(list(g))) for k, g in itertools.groupby(sorted(numbers)))
   keys = map(lambda x: x[0], histogram)
   counts = map(lambda x: x[1], histogram)
   mean_samples = [fast_mean_sample(keys, counts) for i in range(0,sample_count)]
