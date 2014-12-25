@@ -21,8 +21,9 @@ def hdp_for(values, level=.95):
 
 def fast_mean_sample(hypotheses, observations):
   p_hypotheses = numpy.random.dirichlet(observations)
-  return (p_hypotheses*hypotheses).sum()
-
+  sampled_data = numpy.random.multinomial(sum(observations), p_hypotheses)
+  return (sampled_data*hypotheses).sum()/sampled_data.sum()
+  
 def bayesian_bootstrap(numbers, sample_count=5000):
   histogram = list((k, len(list(g)))
            for k, g in itertools.groupby(sorted(numbers)))
