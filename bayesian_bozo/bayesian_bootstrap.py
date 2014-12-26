@@ -33,3 +33,14 @@ def bayesian_bootstrap(numbers, sample_count=5000):
   mean_samples = [fast_mean_sample(keys, counts) for i in range(0,sample_count)]
   mean_mean = numpy.mean(mean_samples)
   return {'mean_samples': mean_samples, 'expected_value':mean_mean, 'hdp_interval':hdp_for(mean_samples)}
+
+def test_difference_of_proportions(control_successes, control_population, variant_successes, variant_population):
+  if control_population == 0 or variant_population == 0:
+    raise RuntimeError('There must be at least one observation in both control and variant populations.')
+  return {
+    'is_significant':False,
+    'lift':{
+      'lower_bound':-1,
+      'upper_bound':1
+    }
+  }
