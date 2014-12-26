@@ -67,6 +67,22 @@ def binomial_distribution_with_one_success_two_observations_test():
 	assert distribution[50] > distribution[50+1]
 	assert round(sum(distribution),12) == 1
 
+def binomial_distribution_with_n_bin_support_test():
+	distribution = bayesian_bozo._test_creating_distribution(0,0,bins=1001)
+	assert len(distribution) == 1001
+	for i in range(1,1001):
+		assert distribution[i-1] == distribution[i]
+	assert round(sum(distribution),12) == 1
+
+def binomial_distribution_with_one_success_two_observations_n_bin_test():
+	distribution = bayesian_bozo._test_creating_distribution(1,2, bins=1001)
+	print distribution
+	assert distribution[0] == 0
+	assert distribution[-1] == 0
+	assert distribution[500] > distribution[500-1]
+	assert distribution[500] > distribution[500+1]
+	assert round(sum(distribution),12) == 1
+
 """def obvious_increased_lift_test():
 	result = bayesian_bozo.test_difference_of_proportions(0,10,10,10)
 	assert result['is_significant'] == True

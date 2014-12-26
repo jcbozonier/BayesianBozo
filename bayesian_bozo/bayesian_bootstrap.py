@@ -34,10 +34,10 @@ def bayesian_bootstrap(numbers, sample_count=5000):
   mean_mean = numpy.mean(mean_samples)
   return {'mean_samples': mean_samples, 'expected_value':mean_mean, 'hdp_interval':hdp_for(mean_samples)}
 
-def _test_creating_distribution(successes, population):
-  distribution = numpy.array([1]*101)/101.
-  for index in range(0,101):
-    hypothesis = index/100.
+def _test_creating_distribution(successes, population, bins=101):
+  distribution = numpy.array([1]*bins)/(1.*bins)
+  for index in range(0,bins):
+    hypothesis = index/(bins*1. - 1)
     distribution[index] = (hypothesis)**successes * (1-hypothesis)**(population-successes)
   distribution = distribution/distribution.sum()
   return distribution
