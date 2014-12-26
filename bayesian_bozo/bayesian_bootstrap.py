@@ -34,9 +34,23 @@ def bayesian_bootstrap(numbers, sample_count=5000):
   mean_mean = numpy.mean(mean_samples)
   return {'mean_samples': mean_samples, 'expected_value':mean_mean, 'hdp_interval':hdp_for(mean_samples)}
 
+def _test_creating_distribution(successes, population):
+  distribution = numpy.array([1]*101)/101.
+  for index in range(0,101):
+    hypothesis = index/100.
+    distribution[index] = (hypothesis)**successes * (1-hypothesis)**(population-successes)
+  distribution = distribution/distribution.sum()
+  return distribution
+
 def test_difference_of_proportions(control_successes, control_population, variant_successes, variant_population):
   if control_population == 0 or variant_population == 0:
     raise RuntimeError('There must be at least one observation in both control and variant populations.')
+  control_distribution = numpy.array([1]*101)/101.
+  variant_distribution = numpy.array([1]*101)/101.
+
+  for hypothesis in range(0,101):
+    control_distribution[hypothesis] = control_distribution[hypothesis]**control_successes * (1-control_distribution[hypothesis])**(control_population-control_successes)
+
   return {
     'is_significant':False,
     'lift':{
