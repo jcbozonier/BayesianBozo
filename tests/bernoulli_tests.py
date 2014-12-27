@@ -4,6 +4,7 @@ import sys
 sys.path.append("/Users/justin/Documents/Code/BayesianBozo")
 
 import bayesian_bozo
+import itertools
 
 @raises(RuntimeError)
 def no_observations_for_control_and_variant_test():
@@ -83,7 +84,40 @@ def binomial_distribution_with_one_success_two_observations_n_bin_test():
 	assert distribution[500] > distribution[500+1]
 	assert round(sum(distribution),12) == 1
 
-"""def obvious_increased_lift_test():
-	result = bayesian_bozo.test_difference_of_proportions(0,10,10,10)
+def compute_exact_lift_between_same_distribution_of_no_observations_test():
+	control = bayesian_bozo._test_creating_distribution(0,0, bins=101)
+	variant = bayesian_bozo._test_creating_distribution(0,0, bins=101)
+	lift_histogram = bayesian_bozo._compute_exact_lift_data(control, variant)
+	assert sum(lift_histogram.values()) == len(control)**2
+	assert lift_histogram[0] == len(control)**2
+
+def compute_exact_lift_between_same_distribution_with_observations_test():
+	control = bayesian_bozo._test_creating_distribution(1,2, bins=101)
+	variant = bayesian_bozo._test_creating_distribution(1,2, bins=101)
+	lift_histogram = bayesian_bozo._compute_exact_lift_data(control, variant)
+
+	print sorted(lift_histogram.items(), key=lambda x: x[1])
+
+	assert lift_histogram[-1] >= 1
+	print 'Number of occurences of zero lift: {0}'.format(lift_histogram[0])
+	assert lift_histogram[0] == 151
+
+	for k,v in lift_histogram.items():
+		if k != 0 and k != -1:
+			assert v < lift_histogram[0]
+
+def create_unimodal_hpd_test():
+	unimodal_hpd = bayesian_bozo._create_unimodal_hpd({
+		1:2.5,
+		3:20,
+		5:55,
+		7:20,
+		10:2.5,
+	})
+	print unimodal_hpd
+	assert unimodal_hpd == [3,7]
+
+def obvious_increased_lift_test():
+	result = bayesian_bozo.test_difference_of_proportions(0,20,20,20)
 	assert result['is_significant'] == True
-	assert 0 < result['lift']['lower_bound'] and 0 < result['lift']['upper_bound']"""
+	#assert 0 < result['lift']['lower_bound'] and 0 < result['lift']['upper_bound']
