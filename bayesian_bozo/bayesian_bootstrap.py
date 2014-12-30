@@ -34,21 +34,16 @@ def bayesian_bootstrap(numbers, sample_count=5000):
   mean_mean = numpy.mean(mean_samples)
   return {'mean_samples': mean_samples, 'expected_value':mean_mean, 'hdp_interval':hdp_for(mean_samples)}
 
-def _test_creating_distribution(successes, population, bins=101):
-  distribution = numpy.array([1]*bins)/(1.*bins)
-  for index in range(0,bins):
-    hypothesis = index/(bins * 1. - 1)
-    distribution[index] = (hypothesis)**successes * (1-hypothesis)**(population-successes)
-  distribution = distribution/distribution.sum()
-  return distribution
-
 def _compute_bootstrapped_lift_data(control_successes, control_population, variant_successes, variant_population):
   samples = []
   for i in range(0,2500):
     control_rate_sample = numpy.random.beta(1 + control_successes, 1 + control_population - control_successes)
     variant_rate_sample = numpy.random.beta(1 + variant_successes, 1 + variant_population - variant_successes)
     if control_rate_sample == 0:
-      samples.append(float('inf'))
+      if variant_rate_sample == 0:
+        samples.append(0.)
+      else:
+        samples.append(float('inf')) 
     else:
       samples.append(variant_rate_sample/control_rate_sample - 1)
   return dict((k, len(list(g))) for k, g in itertools.groupby(sorted(samples)))
@@ -78,14 +73,8 @@ def _create_unimodal_hpd(distribution):
 def test_difference_of_proportions(control_successes, control_population, variant_successes, variant_population):
   if control_population == 0 or variant_population == 0:
     raise RuntimeError('There must be at least one observation in both control and variant populations.')
-  control_distribution = _test_creating_distribution(control_successes, control_population)
-  variant_distribution = _test_creating_distribution(variant_successes, variant_population)
-
   lift_distribution = _compute_bootstrapped_lift_data(control_successes, control_population, variant_successes, variant_population)
   unimodal_hpd = _create_unimodal_hpd(lift_distribution)
-
-  print unimodal_hpd
-
   return {
     'is_significant':0 < unimodal_hpd[0] and 0 < unimodal_hpd[1],
     'lift':{
