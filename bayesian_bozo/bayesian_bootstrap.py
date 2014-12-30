@@ -37,26 +37,21 @@ def bayesian_bootstrap(numbers, sample_count=5000):
 def _test_creating_distribution(successes, population, bins=101):
   distribution = numpy.array([1]*bins)/(1.*bins)
   for index in range(0,bins):
-    hypothesis = index/(bins*1. - 1)
+    hypothesis = index/(bins * 1. - 1)
     distribution[index] = (hypothesis)**successes * (1-hypothesis)**(population-successes)
   distribution = distribution/distribution.sum()
   return distribution
 
-def _compute_exact_lift_data(control_distribution, variant_distribution):
-  lifts = []
-  for i in control_distribution:
-    for k in variant_distribution:
-      if i == 0. and k > 0.:
-        #print 'Parameters yielding infinity: {0}, {1}'.format(i,k)
-        #print 'Types of parameters: {0}, {1}'.format(type(i), type(k))
-        continue
-      elif i == 0. and k == 0.:
-        lift = 0
-      else:
-        lift = (k - i)/(1. * i)
-      lifts.append(lift)
-  return dict((k, len(list(g))) for k, g in itertools.groupby(sorted(lifts)))
-
+def _compute_bootstrapped_lift_data(control_successes, control_population, variant_successes, variant_population):
+  samples = []
+  for i in range(0,2500):
+    control_rate_sample = numpy.random.beta(1 + control_successes, 1 + control_population - control_successes)
+    variant_rate_sample = numpy.random.beta(1 + variant_successes, 1 + variant_population - variant_successes)
+    if control_rate_sample == 0:
+      samples.append(float('inf'))
+    else:
+      samples.append(variant_rate_sample/control_rate_sample - 1)
+  return dict((k, len(list(g))) for k, g in itertools.groupby(sorted(samples)))
 
 def _create_unimodal_hpd(distribution):
   total_observations = 1.*sum(distribution.values())
@@ -78,7 +73,6 @@ def _create_unimodal_hpd(distribution):
       max_value = i[0]
     current_level += i[1]
     current_index += 1
-  print current_level
   return [min_value, max_value]
 
 def test_difference_of_proportions(control_successes, control_population, variant_successes, variant_population):
@@ -87,8 +81,7 @@ def test_difference_of_proportions(control_successes, control_population, varian
   control_distribution = _test_creating_distribution(control_successes, control_population)
   variant_distribution = _test_creating_distribution(variant_successes, variant_population)
 
-  lift_distribution = _compute_exact_lift_data(control_distribution, variant_distribution)
-  #print sorted(lift_distribution.items(), key=lambda x: x[1])
+  lift_distribution = _compute_bootstrapped_lift_data(control_successes, control_population, variant_successes, variant_population)
   unimodal_hpd = _create_unimodal_hpd(lift_distribution)
 
   print unimodal_hpd
@@ -96,7 +89,7 @@ def test_difference_of_proportions(control_successes, control_population, varian
   return {
     'is_significant':0 < unimodal_hpd[0] and 0 < unimodal_hpd[1],
     'lift':{
-      'lower_bound':-1,
-      'upper_bound':1
+      'lower_bound':unimodal_hpd[0],
+      'upper_bound':unimodal_hpd[1]
     }
   }

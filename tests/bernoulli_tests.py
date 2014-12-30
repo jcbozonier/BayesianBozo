@@ -118,6 +118,11 @@ def create_unimodal_hpd_test():
 	assert unimodal_hpd == [3,7]
 
 def obvious_increased_lift_test():
-	result = bayesian_bozo.test_difference_of_proportions(0,20,20,20)
+	result = bayesian_bozo.test_difference_of_proportions(0,10,10,10)
 	assert result['is_significant'] == True
-	#assert 0 < result['lift']['lower_bound'] and 0 < result['lift']['upper_bound']
+	assert 0 < result['lift']['lower_bound'] and 0 < result['lift']['upper_bound'], "should provide an HPD interval with zero excluded."
+
+def ambiguous_lift_test():
+	result = bayesian_bozo.test_difference_of_proportions(10,10,10,10)
+	assert result['is_significant'] == False, 'Should never be statistically significant.'
+	assert result['lift']['lower_bound'] < 0 and 0 < result['lift']['upper_bound'], "should provide an HPD interval with zero included."
