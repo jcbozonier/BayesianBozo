@@ -22,7 +22,7 @@ def fast_mean_sample(hypotheses, observations):
   sampled_data = numpy.random.multinomial(sum(observations), p_hypotheses)
   return (sampled_data*hypotheses).sum()/(1.0*sampled_data.sum())
   
-def bayesian_bootstrap(numbers, sample_count=5000):
+def bayesian_bootstrap(numbers, sample_count=2500):
   for i in numbers:
     if not type(i) is int:
       raise TypeError('All data must be integers.') 
@@ -48,7 +48,7 @@ def bayesian_bootstrap_lift(control_numbers, variant_numbers, sample_count=2500)
     sampled_mean_lifts.append(sampled_variant_mean - sampled_control_mean)
 
   hdp = hdp_for(sampled_mean_lifts)
-
+  
   return {
     'mean_lift':numpy.mean(sampled_mean_lifts),
     'lift_samples': sampled_mean_lifts,
