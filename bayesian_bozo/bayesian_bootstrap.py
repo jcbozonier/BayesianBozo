@@ -1,5 +1,4 @@
-import numpy
-import itertools
+import numpy, random, itertools, math
 
 def hdp_for(rounded_values, level=.95):
     groupings = {}
@@ -8,7 +7,7 @@ def hdp_for(rounded_values, level=.95):
             groupings[value] = 0
         groupings[value] += 1
     sorted_lifts = sorted(groupings.items(), key=lambda x: x[1], reverse=False)
-    count = len(values)
+    count = len(rounded_values)
     target_hdp_count = int(level*count)
     current_hdp_count = 0
     hdp_list = []
@@ -21,7 +20,7 @@ def hdp_for(rounded_values, level=.95):
 def fast_mean_sample(hypotheses, observations):
   p_hypotheses = numpy.random.dirichlet(observations)
   sampled_data = numpy.random.multinomial(sum(observations), p_hypotheses)
-  return (sampled_data*hypotheses).sum()/sampled_data.sum()
+  return (sampled_data*hypotheses).sum()/(1.0*sampled_data.sum())
   
 def bayesian_bootstrap(numbers, sample_count=5000):
   for i in numbers:
@@ -30,9 +29,32 @@ def bayesian_bootstrap(numbers, sample_count=5000):
   histogram = list((k, len(list(g))) for k, g in itertools.groupby(sorted(numbers)))
   keys = map(lambda x: x[0], histogram)
   counts = map(lambda x: x[1], histogram)
-  mean_samples = [fast_mean_sample(keys, counts) for i in range(0,sample_count)]
+  mean_samples = [int(round(fast_mean_sample(keys, counts))) for i in range(0,sample_count)]
   mean_mean = numpy.mean(mean_samples)
   return {'mean_samples': mean_samples, 'expected_value':mean_mean, 'hdp_interval':hdp_for(mean_samples)}
+
+def bayesian_bootstrap_lift(control_numbers, variant_numbers, sample_count=2500):
+  if len(control_numbers) == 0 or len(variant_numbers) == 0:
+    raise RuntimeError('Must have at least one data point for control data')
+
+  control_sampled_data = bayesian_bootstrap(control_numbers)
+  variant_sampled_data = bayesian_bootstrap(variant_numbers)
+
+  sampled_mean_lifts = []
+
+  for i in range(0,sample_count):
+    sampled_control_mean = random.choice(control_sampled_data['mean_samples'])
+    sampled_variant_mean = random.choice(variant_sampled_data['mean_samples'])
+    sampled_mean_lifts.append(sampled_variant_mean - sampled_control_mean)
+
+  hdp = hdp_for(sampled_mean_lifts)
+
+  return {
+    'mean_lift':numpy.mean(sampled_mean_lifts),
+    'lift_samples': sampled_mean_lifts,
+    'is_significant': 0. < hdp[0] and 0. < hdp[1],
+    'hdp': hdp
+  }
 
 def _compute_bootstrapped_lift_data(control_successes, control_population, variant_successes, variant_population):
   samples = []
