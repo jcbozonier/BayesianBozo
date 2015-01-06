@@ -5,7 +5,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 setup(
-    name='bayesian_bozo',
+    name='BayesianBozo',
     version = '0.0.3',
 
     #packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
