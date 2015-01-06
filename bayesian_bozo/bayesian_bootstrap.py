@@ -33,7 +33,7 @@ def bayesian_bootstrap(numbers, sample_count=2500):
   mean_mean = numpy.mean(mean_samples)
   return {'mean_samples': mean_samples, 'expected_value':mean_mean, 'hdp_interval':hdp_for(mean_samples)}
 
-def bayesian_bootstrap_lift(control_numbers, variant_numbers, sample_count=2500):
+def bayesian_bootstrap_diff(control_numbers, variant_numbers, sample_count=2500):
   if len(control_numbers) == 0 or len(variant_numbers) == 0:
     raise RuntimeError('Must have at least one data point for control data')
 
