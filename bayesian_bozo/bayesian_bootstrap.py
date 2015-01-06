@@ -50,8 +50,8 @@ def bayesian_bootstrap_diff(control_numbers, variant_numbers, sample_count=2500)
   hdp = hdp_for(sampled_mean_lifts)
   
   return {
-    'mean_lift':numpy.mean(sampled_mean_lifts),
-    'lift_samples': sampled_mean_lifts,
+    'mean_diff':numpy.mean(sampled_mean_lifts),
+    'diff_samples': sampled_mean_lifts,
     'is_significant': 0. < hdp[0] and 0. < hdp[1],
     'hdp': hdp
   }
@@ -103,4 +103,27 @@ def test_difference_of_proportions(control_successes, control_population, varian
       'lower_bound':unimodal_hpd[0],
       'upper_bound':unimodal_hpd[1]
     }
+  }
+
+def bayesian_bootstrap_lift(control_numbers, variant_numbers, sample_count=2500):
+  if len(control_numbers) == 0 or len(variant_numbers) == 0:
+    raise RuntimeError('Must have at least one data point for control data')
+  print control_numbers
+  control_sampled_data = bayesian_bootstrap(control_numbers)
+  variant_sampled_data = bayesian_bootstrap(variant_numbers)
+
+  sampled_mean_lifts = []
+
+  for i in range(0,sample_count):
+    sampled_control_mean = random.choice(control_sampled_data['mean_samples'])
+    sampled_variant_mean = random.choice(variant_sampled_data['mean_samples'])
+    sampled_mean_lifts.append((sampled_variant_mean-sampled_control_mean)/(1.*sampled_control_mean))
+
+  hdp = hdp_for(sampled_mean_lifts)
+  
+  return {
+    'mean_lift':numpy.mean(sampled_mean_lifts),
+    'lift_samples': sampled_mean_lifts,
+    'is_significant': 0. < hdp[0] and 0. < hdp[1],
+    'hdp': hdp
   }
