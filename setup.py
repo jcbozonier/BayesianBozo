@@ -6,7 +6,7 @@ here = path.abspath(path.dirname(__file__))
 
 setup(
     name='BayesianBozo',
-    version = '0.0.4',
+    version = '0.0.5',
 
     #packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
 
