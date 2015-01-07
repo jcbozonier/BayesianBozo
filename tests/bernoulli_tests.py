@@ -120,3 +120,18 @@ def bayesian_bootstrap_lift_with_two_discrete_poisson_distributions_not_differen
 	assert not float('-inf') in result['hdp'] and not float('inf') in result['hdp'], 'Should have somewhat of an idea of a range.'
 	assert result['hdp'][0] <= 0., 'Should be smaller range than this.'
 	assert result['hdp'][1] >= 0., 'Should be smaller range than this.'
+
+def bayesian_bootstrap_lift_with_limited_data_no_lift_test():
+	control_data = [0]
+	variant_data = [0,1]
+	result = bayesian_bozo.bayesian_bootstrap_lift(control_data, variant_data)
+	print result
+	assert result['is_significant'] == False
+
+def bayesian_bootstrap_lift_with_limited_data_no_lift_both_zero_test():
+	control_data = [0]
+	variant_data = [0]
+	result = bayesian_bozo.bayesian_bootstrap_lift(control_data, variant_data)
+	print result
+	assert result['is_significant'] == False
+

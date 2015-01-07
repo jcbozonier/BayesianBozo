@@ -77,7 +77,6 @@ def _create_unimodal_hpd(distribution):
   max_value = None
   current_level = 0
   current_index = 0
-  print sorted_bins[0:100]
   while current_level < .95:
     i = sorted_bins[current_index]
     if min_value == None:
@@ -108,7 +107,6 @@ def test_difference_of_proportions(control_successes, control_population, varian
 def bayesian_bootstrap_lift(control_numbers, variant_numbers, sample_count=2500):
   if len(control_numbers) == 0 or len(variant_numbers) == 0:
     raise RuntimeError('Must have at least one data point for control data')
-  print control_numbers
   control_sampled_data = bayesian_bootstrap(control_numbers)
   variant_sampled_data = bayesian_bootstrap(variant_numbers)
 
@@ -117,7 +115,12 @@ def bayesian_bootstrap_lift(control_numbers, variant_numbers, sample_count=2500)
   for i in range(0,sample_count):
     sampled_control_mean = random.choice(control_sampled_data['mean_samples'])
     sampled_variant_mean = random.choice(variant_sampled_data['mean_samples'])
-    sampled_mean_lifts.append((sampled_variant_mean-sampled_control_mean)/(1.*sampled_control_mean))
+    if sampled_control_mean == 0. and sampled_variant_mean != 0.:
+      sampled_mean_lifts.append(float('inf'))
+    elif sampled_control_mean == 0. and sampled_variant_mean == 0.:
+      sampled_mean_lifts.append(0.)
+    else:
+      sampled_mean_lifts.append((sampled_variant_mean-sampled_control_mean)/(1.*sampled_control_mean))
 
   hdp = hdp_for(sampled_mean_lifts)
   
