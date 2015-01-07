@@ -29,7 +29,7 @@ def bayesian_bootstrap(numbers, sample_count=2500):
   histogram = list((k, len(list(g))) for k, g in itertools.groupby(sorted(numbers)))
   keys = map(lambda x: x[0], histogram)
   counts = map(lambda x: x[1], histogram)
-  mean_samples = [round(fast_mean_sample(keys, counts),1) for i in range(0,sample_count)]
+  mean_samples = [fast_mean_sample(keys, counts) for i in range(0,sample_count)]
   mean_mean = numpy.mean(mean_samples)
   return {'mean_samples': mean_samples, 'expected_value':mean_mean, 'hdp_interval':hdp_for(mean_samples)}
 
