@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='BayesianBozo',
-    version='0.0.9',
+    version='0.1.0',
     author_email='darkxanthos@gmail.com',
     description='Bayesian statistical functions for Python',
     long_description='Bayesian statistical functions and algorithms Ive needed to build as I delve deeper into Bayesian Statistics',
