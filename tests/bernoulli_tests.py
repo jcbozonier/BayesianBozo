@@ -122,8 +122,8 @@ def bayesian_bootstrap_lift_with_two_discrete_poisson_distributions_not_differen
 	assert result['hdp'][1] >= 0., 'Should be smaller range than this.'
 
 def bayesian_bootstrap_lift_with_limited_data_no_lift_test():
-	control_data = [0]
-	variant_data = [0,1]
+	control_data = [0,1]
+	variant_data = [0,1,2]
 	result = bayesian_bozo.bayesian_bootstrap_lift(control_data, variant_data)
 	print result
 	assert result['is_significant'] == False
@@ -134,4 +134,3 @@ def bayesian_bootstrap_lift_with_limited_data_no_lift_both_zero_test():
 	result = bayesian_bozo.bayesian_bootstrap_lift(control_data, variant_data)
 	print result
 	assert result['is_significant'] == False
-

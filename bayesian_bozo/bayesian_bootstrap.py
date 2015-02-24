@@ -19,8 +19,7 @@ def hdp_for(rounded_values, level=.95):
 
 def fast_mean_sample(hypotheses, observations):
   p_hypotheses = numpy.random.dirichlet(observations)
-  sampled_data = numpy.random.multinomial(sum(observations), p_hypotheses)
-  return (sampled_data*hypotheses).sum()/(1.0*sampled_data.sum())
+  return (p_hypotheses*hypotheses).sum()
   
 def bayesian_bootstrap(numbers, sample_count=2500):
   for i in numbers:
